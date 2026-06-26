@@ -10,9 +10,9 @@ export default function Home() {
 
       <Title />
 
-      <Bee top="12%" left="72%" />
-      <Bee top="58%" left="20%" />
-      <Bee top="75%" left="62%" />
+      <Bee top="12%" left="72%" delay={0.5} />
+      <Bee top="58%" left="20%" delay={1.2} />
+      <Bee top="75%" left="62%" delay={0.7} />
 
       <HoneyPot />
     </main>

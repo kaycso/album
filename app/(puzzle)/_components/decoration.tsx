@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { AnimatedDecoration, type Animation } from "./animated-decoration";
 
 type DecorationProps = {
   src: string;
@@ -9,6 +10,8 @@ type DecorationProps = {
   right?: string;
   bottom?: string;
   rotate?: number;
+  animation?: Animation;
+  delay?: number;
 };
 
 export function Decoration({
@@ -20,6 +23,8 @@ export function Decoration({
   right,
   bottom,
   rotate = 0,
+  animation = "none",
+  delay,
 }: DecorationProps) {
   return (
     <div
@@ -32,7 +37,15 @@ export function Decoration({
         transform: `rotate(${rotate}deg)`,
       }}
     >
-      <Image src={src} alt={alt} width={size} height={size} draggable={false} />
+      <AnimatedDecoration animation={animation} delay={delay}>
+        <Image
+          src={src}
+          alt={alt}
+          width={size}
+          height={size}
+          draggable={false}
+        />
+      </AnimatedDecoration>
     </div>
   );
 }

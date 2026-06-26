@@ -10,6 +10,8 @@ export function Background() {
         top="5%"
         left="8%"
         rotate={-15}
+        animation="pulse"
+        delay={0.3}
       />
 
       <Decoration
@@ -19,6 +21,8 @@ export function Background() {
         bottom="15%"
         right="12%"
         rotate={18}
+        animation="pulse"
+        delay={1.1}
       />
 
       <Decoration
@@ -27,6 +31,8 @@ export function Background() {
         size={80}
         top="18%"
         right="18%"
+        animation="sway"
+        delay={0.6}
       />
 
       <Decoration
@@ -35,6 +41,8 @@ export function Background() {
         size={90}
         bottom="8%"
         left="15%"
+        animation="sway"
+        delay={1.8}
       />
     </>
   );
