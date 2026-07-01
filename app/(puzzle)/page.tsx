@@ -2,6 +2,7 @@ import { Background } from "./_components/background";
 import { Bee } from "./_components/bee";
 import { HoneyPot } from "./_components/honey-pot";
 import { Title } from "./_components/title";
+import { bees, honeyPot } from "./_data/scene";
 
 export default function Home() {
   return (
@@ -10,11 +11,11 @@ export default function Home() {
 
       <Title />
 
-      <Bee top="12%" left="72%" delay={0.5} />
-      <Bee top="58%" left="20%" delay={1.2} />
-      <Bee top="75%" left="62%" delay={0.7} />
+      {bees.map((bee) => (
+        <Bee key={bee.id} {...bee} />
+      ))}
 
-      <HoneyPot />
+      <HoneyPot {...honeyPot} />
     </main>
   );
 }

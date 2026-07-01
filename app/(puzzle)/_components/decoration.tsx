@@ -1,39 +1,23 @@
-import Image from "next/image";
-import { AnimatedDecoration, type Animation } from "./animated-decoration";
+"use client";
 
-type DecorationProps = {
-  src: string;
-  alt: string;
-  size: number;
-  top?: string;
-  left?: string;
-  right?: string;
-  bottom?: string;
-  rotate?: number;
-  animation?: Animation;
-  delay?: number;
-};
+import Image from "next/image";
+import { DecorationData } from "../types";
+import { AnimatedDecoration } from "./animated-decoration";
 
 export function Decoration({
   src,
   alt,
   size,
-  top,
-  left,
-  right,
-  bottom,
+  position,
   rotate = 0,
   animation = "none",
   delay,
-}: DecorationProps) {
+}: DecorationData) {
   return (
     <div
       className="pointer-events-none absolute select-none"
       style={{
-        top,
-        left,
-        right,
-        bottom,
+        ...position,
         transform: `rotate(${rotate}deg)`,
       }}
     >

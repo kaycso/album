@@ -1,18 +1,24 @@
+"use client";
+
 import Image from "next/image";
+import { BeeData } from "../types";
 import { AnimatedDecoration } from "./animated-decoration";
 
-type BeeProps = {
-  top: string;
-  left: string;
-  rotate?: number;
-  delay?: number;
+type BeeProps = BeeData & {
+  onClick?: (id: string) => void;
 };
 
-export function Bee({ top, left, rotate = 270, delay }: BeeProps) {
+export function Bee({ id, position, rotate, delay, onClick }: BeeProps) {
   return (
-    <div
-      className="absolute"
-      style={{ top, left, transform: `rotate(${rotate}deg)` }}
+    <button
+      type="button"
+      className="absolute cursor-pointer border-none bg-transparent p-0"
+      style={{
+        top: position.y,
+        left: position.x,
+        transform: `rotate(${rotate}deg)`,
+      }}
+      onClick={() => onClick?.(id)}
     >
       <AnimatedDecoration animation="float" delay={delay}>
         <Image
@@ -24,6 +30,6 @@ export function Bee({ top, left, rotate = 270, delay }: BeeProps) {
           draggable={false}
         />
       </AnimatedDecoration>
-    </div>
+    </button>
   );
 }
