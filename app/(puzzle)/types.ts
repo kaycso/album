@@ -10,7 +10,6 @@ export type BeeData = {
   position: Position;
   rotate: number;
   delay: number;
-  isCorrect: boolean;
 };
 
 export type DecorationData = {
@@ -39,3 +38,48 @@ export type DecorationData = {
 export type HoneyPotData = {
   position: Position;
 };
+
+export type PuzzleStage =
+  | "idle"
+  | "beeSelected"
+  | "beeFlying"
+  | "pouringHoney"
+  | "celebration"
+  | "albumAppearing"
+  | "albumOpening"
+  | "completed";
+
+export type PuzzleState = {
+  stage: PuzzleStage;
+
+  selectedBeeId: string | null;
+};
+
+export type PuzzleAction =
+  | {
+      type: "SELECT_BEE";
+      payload: {
+        beeId: string;
+      };
+    }
+  | {
+      type: "START_FLYING";
+    }
+  | {
+      type: "START_POURING";
+    }
+  | {
+      type: "CELEBRATE";
+    }
+  | {
+      type: "SHOW_ALBUM";
+    }
+  | {
+      type: "OPEN_ALBUM";
+    }
+  | {
+      type: "COMPLETE";
+    }
+  | {
+      type: "RESET";
+    };

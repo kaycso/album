@@ -1,6 +1,6 @@
 import { BeeData, DecorationData, HoneyPotData } from "../types";
 
-export const bees: BeeData[] = [
+const bees: BeeData[] = [
   {
     id: "bee-1",
     position: {
@@ -9,7 +9,6 @@ export const bees: BeeData[] = [
     },
     rotate: 270,
     delay: 0.5,
-    isCorrect: true,
   },
   {
     id: "bee-2",
@@ -19,7 +18,6 @@ export const bees: BeeData[] = [
     },
     rotate: 270,
     delay: 1.2,
-    isCorrect: false,
   },
   {
     id: "bee-3",
@@ -29,18 +27,17 @@ export const bees: BeeData[] = [
     },
     rotate: 270,
     delay: 0.7,
-    isCorrect: false,
   },
 ];
 
-export const honeyPot: HoneyPotData = {
+const honeyPot: HoneyPotData = {
   position: {
     x: 5,
     y: 82,
   },
 };
 
-export const decorations: DecorationData[] = [
+const decorations: DecorationData[] = [
   {
     id: "heart-top-left",
     src: "/illustrations/heart-exclamation-svgrepo-com.svg",
@@ -54,7 +51,6 @@ export const decorations: DecorationData[] = [
     animation: "pulse",
     delay: 0.3,
   },
-
   {
     id: "heart-bottom-right",
     src: "/illustrations/heart-exclamation-svgrepo-com.svg",
@@ -68,7 +64,6 @@ export const decorations: DecorationData[] = [
     animation: "pulse",
     delay: 1.1,
   },
-
   {
     id: "flower-top-right",
     src: "/illustrations/flowers-flower-svgrepo-com.svg",
@@ -81,7 +76,6 @@ export const decorations: DecorationData[] = [
     animation: "sway",
     delay: 0.6,
   },
-
   {
     id: "flower-bottom-left",
     src: "/illustrations/flowers-flower-svgrepo-com.svg",
@@ -95,3 +89,10 @@ export const decorations: DecorationData[] = [
     delay: 1.8,
   },
 ];
+
+export const scene = {
+  bees,
+  decorations,
+  honeyPot,
+  correctBeeId: "bee-1",
+} as const;
