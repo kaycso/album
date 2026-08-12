@@ -99,8 +99,10 @@ export default function Home() {
 
         {selectedBee && (
           <FlightTrail
-            start={selectedBee.position}
-            end={scene.honeyPot.position}
+            key={state.stage === "idle" ? "return" : "flight"}
+            beePosition={selectedBee.position}
+            potPosition={scene.honeyPot.position}
+            returning={state.stage === "idle"}
           />
         )}
 

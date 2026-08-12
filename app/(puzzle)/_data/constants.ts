@@ -21,3 +21,5 @@ export const FLIGHT_LOOP_RADIUS = 90;
 export const FLIGHT_LOOP_RADIUS_MAX = 150;
 
 export const RETURN_BOW = 60;
+
+export const RETURN_BOW_MAX = 160;

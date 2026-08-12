@@ -4,6 +4,7 @@ import {
   FLIGHT_LOOP_RADIUS_MAX,
   FLIGHT_POINTS,
   RETURN_BOW,
+  RETURN_BOW_MAX,
 } from "./constants";
 
 export type Waypoint = {
@@ -124,14 +125,15 @@ export function buildReturnPath(
   const len = Math.hypot(dx, dy) || 1;
   const nx = -dy / len;
   const ny = dx / len;
+  const bow = Math.min(Math.max(RETURN_BOW, len / 7), RETURN_BOW_MAX);
 
   const raw = Array.from({ length: RAW_SAMPLES }, (_, index) => {
     const t = index / (RAW_SAMPLES - 1);
-    const bow = RETURN_BOW * Math.sin(t * Math.PI);
+    const bowAt = bow * Math.sin(t * Math.PI * 2);
 
     return {
-      x: startX + dx * t + nx * bow,
-      y: startY + dy * t + ny * bow,
+      x: startX + dx * t + nx * bowAt,
+      y: startY + dy * t + ny * bowAt,
     };
   });
 
