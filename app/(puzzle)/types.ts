@@ -5,11 +5,14 @@ export type Position = {
   y: number;
 };
 
+export type PuzzleLetter = "M" | "E" | "L";
+
 export type BeeData = {
   id: string;
   position: Position;
   rotate: number;
   delay: number;
+  letter?: PuzzleLetter;
 };
 
 export type DecorationData = {
@@ -53,6 +56,12 @@ export type PuzzleState = {
   stage: PuzzleStage;
 
   selectedBeeId: string | null;
+
+  collectedLetters: PuzzleLetter[];
+
+  wrongBeeId: string | null;
+
+  wrongNonce: number;
 };
 
 export type PuzzleAction =
@@ -60,6 +69,7 @@ export type PuzzleAction =
       type: "SELECT_BEE";
       payload: {
         beeId: string;
+        letter: PuzzleLetter | null;
       };
     }
   | {

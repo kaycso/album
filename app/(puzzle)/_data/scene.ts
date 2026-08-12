@@ -9,6 +9,7 @@ const bees: BeeData[] = [
     },
     rotate: 270,
     delay: 0.5,
+    letter: "M",
   },
   {
     id: "bee-2",
@@ -18,6 +19,7 @@ const bees: BeeData[] = [
     },
     rotate: 270,
     delay: 1.2,
+    letter: "E",
   },
   {
     id: "bee-3",
@@ -27,6 +29,25 @@ const bees: BeeData[] = [
     },
     rotate: 270,
     delay: 0.7,
+    letter: "L",
+  },
+  {
+    id: "bee-4",
+    position: {
+      x: 32,
+      y: 14,
+    },
+    rotate: 270,
+    delay: 1.7,
+  },
+  {
+    id: "bee-5",
+    position: {
+      x: 80,
+      y: 46,
+    },
+    rotate: 270,
+    delay: 2.2,
   },
 ];
 
@@ -90,9 +111,10 @@ const decorations: DecorationData[] = [
   },
 ];
 
+export const correctSequence = ["M", "E", "L"] as const;
+
 export const scene = {
   bees,
   decorations,
   honeyPot,
-  correctBeeId: "bee-1",
 } as const;

@@ -1,8 +1,12 @@
 import { PuzzleAction, PuzzleState } from "../types";
+import { correctSequence } from "../_data/scene";
 
 export const initialPuzzleState: PuzzleState = {
   stage: "idle",
   selectedBeeId: null,
+  collectedLetters: [],
+  wrongBeeId: null,
+  wrongNonce: 0,
 };
 
 export function puzzleReducer(
@@ -10,12 +14,45 @@ export function puzzleReducer(
   action: PuzzleAction,
 ): PuzzleState {
   switch (action.type) {
-    case "SELECT_BEE":
+    case "SELECT_BEE": {
+      const { beeId, letter } = action.payload;
+
+      if (letter === null) {
+        return {
+          ...state,
+          wrongBeeId: beeId,
+          wrongNonce: state.wrongNonce + 1,
+        };
+      }
+
+      if (state.collectedLetters.includes(letter)) {
+        return {
+          ...state,
+          wrongBeeId: beeId,
+          wrongNonce: state.wrongNonce + 1,
+        };
+      }
+
+      const expectedLetter = correctSequence[state.collectedLetters.length];
+
+      if (letter === expectedLetter) {
+        return {
+          ...state,
+          stage: "beeSelected",
+          selectedBeeId: beeId,
+          collectedLetters: [...state.collectedLetters, letter],
+        };
+      }
+
       return {
         ...state,
-        stage: "beeSelected",
-        selectedBeeId: action.payload.beeId,
+        stage: "idle",
+        selectedBeeId: null,
+        collectedLetters: [],
+        wrongBeeId: beeId,
+        wrongNonce: state.wrongNonce + 1,
       };
+    }
 
     case "START_FLYING":
       return {
