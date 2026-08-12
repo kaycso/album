@@ -66,6 +66,18 @@ export function puzzleReducer(
         stage: "pouringHoney",
       };
 
+    case "FINISH_POUR":
+      return {
+        ...state,
+        stage: "idle",
+      };
+
+    case "FINISH_RETURN":
+      return {
+        ...state,
+        selectedBeeId: null,
+      };
+
     case "CELEBRATE":
       return {
         ...state,

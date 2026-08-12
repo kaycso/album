@@ -1,16 +1,40 @@
 "use client";
 
+import { useEffect } from "react";
+
+import { scene } from "./_data/scene";
+import { usePuzzle } from "./hooks/use-puzzle";
 import { Background } from "./scene/background";
 import { Bee } from "./scene/bee";
 import { HoneyPot } from "./scene/honey-pot";
 import { Title } from "./scene/title";
-import { scene } from "./_data/scene";
-import { usePuzzle } from "./hooks/use-puzzle";
 
 export default function Home() {
   const { state, dispatch } = usePuzzle();
 
-  const interactive = state.stage === "idle" || state.stage === "beeSelected";
+  useEffect(() => {
+    if (state.stage === "beeSelected") {
+      const timer = setTimeout(() => dispatch({ type: "START_FLYING" }), 1400);
+      return () => clearTimeout(timer);
+    }
+
+    if (state.stage === "beeFlying") {
+      const timer = setTimeout(() => dispatch({ type: "START_POURING" }), 500);
+      return () => clearTimeout(timer);
+    }
+
+    if (state.stage === "pouringHoney") {
+      const timer = setTimeout(() => dispatch({ type: "FINISH_POUR" }), 700);
+      return () => clearTimeout(timer);
+    }
+
+    if (state.stage === "idle" && state.selectedBeeId) {
+      const timer = setTimeout(() => dispatch({ type: "FINISH_RETURN" }), 2200);
+      return () => clearTimeout(timer);
+    }
+  }, [state.stage, state.selectedBeeId, dispatch]);
+
+  const interactive = state.stage === "idle";
 
   const handleBeeClick = (beeId: string) => {
     if (!interactive) return;
@@ -36,7 +60,9 @@ export default function Home() {
         <Bee
           key={bee.id}
           {...bee}
-          disabled={!interactive}
+          stage={state.stage}
+          selectedBeeId={state.selectedBeeId}
+          potPosition={scene.honeyPot.position}
           wrongTarget={state.wrongBeeId}
           wrongNonce={state.wrongNonce}
           collected={
@@ -46,7 +72,7 @@ export default function Home() {
         />
       ))}
 
-      <HoneyPot {...scene.honeyPot} />
+      <HoneyPot {...scene.honeyPot} level={state.collectedLetters.length} />
     </main>
   );
 }

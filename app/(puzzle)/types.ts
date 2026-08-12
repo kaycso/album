@@ -79,6 +79,12 @@ export type PuzzleAction =
       type: "START_POURING";
     }
   | {
+      type: "FINISH_POUR";
+    }
+  | {
+      type: "FINISH_RETURN";
+    }
+  | {
       type: "CELEBRATE";
     }
   | {

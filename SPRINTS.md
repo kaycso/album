@@ -68,6 +68,12 @@
 
 ---
 
+## Polimento final (antes de entregar a branch)
+
+- Voo não-linear da abelha ao acertar: piruetas (rotação/espiral no meio do caminho) + rastro tracejado (dashed) marcando o trajeto até o pote.
+
+---
+
 ## Melhorias futuras (fora desta branch)
 
 - O "Mel" do título escorrendo junto quando o mel cai.
