@@ -2,10 +2,19 @@
 
 import Image from "next/image";
 import { motion, useAnimate } from "framer-motion";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
-import { BEE_SIZE, HONEY_POT_SIZE } from "../_data/constants";
+import {
+  BEE_SIZE,
+  FLIGHT_DURATION,
+  FLIGHT_POINTS,
+  FLIGHT_WANDER_X,
+  FLIGHT_WANDER_Y,
+  HONEY_POT_SIZE,
+} from "../_data/constants";
 import { BeeData, Position, PuzzleStage } from "../types";
+
+const RETURN_DURATION = 3;
 
 type BeeProps = BeeData & {
   stage: PuzzleStage;
@@ -16,6 +25,36 @@ type BeeProps = BeeData & {
   collected: boolean;
   onClick?: (id: string) => void;
 };
+
+type Waypoint = {
+  x: number;
+  y: number;
+};
+
+function buildWaypoints(dx: number, dy: number): Waypoint[] {
+  return Array.from({ length: FLIGHT_POINTS }, (_, index) => {
+    const t = index / (FLIGHT_POINTS - 1);
+
+    return {
+      x: dx * t + Math.sin(t * Math.PI * 2) * FLIGHT_WANDER_X,
+      y: dy * t - Math.sin(t * Math.PI) * FLIGHT_WANDER_Y,
+    };
+  });
+}
+
+function buildRotationKeyframes(
+  points: Waypoint[],
+  baseRotate: number,
+): number[] {
+  return points.map((point, index) => {
+    const segment = Math.min(index, points.length - 2);
+    const next = points[segment + 1];
+    const heading =
+      (Math.atan2(next.y - point.y, next.x - point.x) * 180) / Math.PI;
+
+    return heading + 90 - baseRotate;
+  });
+}
 
 export function Bee({
   id,
@@ -50,6 +89,24 @@ export function Bee({
   const dx = ((potPosition.x - position.x) * width) / 100 + sizeOffset;
   const dy = ((potPosition.y - position.y) * height) / 100 + sizeOffset;
 
+  const goPoints = useMemo(() => buildWaypoints(dx, dy), [dx, dy]);
+  const returnPoints = useMemo(() => [...goPoints].reverse(), [goPoints]);
+
+  const goRotations = useMemo(
+    () => buildRotationKeyframes(goPoints, rotate),
+    [goPoints, rotate],
+  );
+  const returnRotations = useMemo(
+    () => buildRotationKeyframes(returnPoints, rotate),
+    [returnPoints, rotate],
+  );
+
+  const goX = goPoints.map((point) => point.x);
+  const goY = goPoints.map((point) => point.y);
+  const returnX = returnPoints.map((point) => point.x);
+  const returnY = returnPoints.map((point) => point.y);
+  const endRotate = goRotations[goRotations.length - 1];
+
   useEffect(() => {
     if (wrongTarget === id && scope.current) {
       animate(
@@ -68,14 +125,21 @@ export function Bee({
         left: `${position.x}%`,
       }}
       animate={{
-        x: flying ? [0, dx] : atPot ? dx : returning ? [dx, 0] : 0,
-        y: flying ? [0, dy - 30, dy] : atPot ? dy : returning ? [dy, 0] : 0,
+        x: flying ? goX : atPot ? dx : returning ? returnX : 0,
+        y: flying ? goY : atPot ? dy : returning ? returnY : 0,
+        rotate: flying
+          ? goRotations
+          : atPot
+            ? endRotate
+            : returning
+              ? returnRotations
+              : 0,
       }}
       transition={
         flying
-          ? { duration: 1.4, ease: "easeInOut" }
+          ? { duration: FLIGHT_DURATION, ease: "linear" }
           : returning
-            ? { duration: 2, ease: "easeInOut" }
+            ? { duration: RETURN_DURATION, ease: "linear" }
             : { duration: 0.6, ease: "easeInOut" }
       }
     >
@@ -114,6 +178,7 @@ export function Bee({
             height={BEE_SIZE}
             priority
             draggable={false}
+            className="h-auto w-[clamp(44px,9vw,70px)]"
           />
         </motion.div>
 

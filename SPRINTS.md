@@ -8,6 +8,15 @@
 2. O usuário valida o resultado e confirma o commit manualmente.
 3. Só então seguimos para a sprint seguinte.
 
+## Status
+
+- [x] Sprint 0 — Estabilizar refactor + dívidas
+- [x] Sprint 1 — Mecânica do puzzle (lógica + feedback de erro)
+- [x] Sprint 2 — Voo da abelha + pote enchendo
+- [x] Sprint 3 — "Cai mel" + celebração
+- [x] Sprint 4 — Transição para o álbum + finalização
+- [x] Polimento final — pirueta no voo + rastro tracejado
+
 ## Sprint 0 — Estabilizar refactor + dívidas
 
 - Corrigir `scene/decoration.tsx` (mapa de animações sem `float`/`breathe`) e `scene/title.tsx` (import quebrado).

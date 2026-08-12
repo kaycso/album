@@ -36,6 +36,8 @@ export type DecorationData = {
   animation?: Animation;
 
   delay?: number;
+
+  hideOnMobile?: boolean;
 };
 
 export type HoneyPotData = {

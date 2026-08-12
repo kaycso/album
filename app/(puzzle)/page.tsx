@@ -1,21 +1,26 @@
 "use client";
 
 import { useEffect } from "react";
+import { MotionConfig } from "framer-motion";
 
 import { scene } from "./_data/scene";
 import { usePuzzle } from "./hooks/use-puzzle";
+import { AlbumPlaceholder } from "./scene/album-placeholder";
 import { Background } from "./scene/background";
 import { Bee } from "./scene/bee";
+import { FlightTrail } from "./scene/flight-trail";
 import { HoneyPot } from "./scene/honey-pot";
 import { HoneyRain } from "./scene/honey-rain";
 import { Title } from "./scene/title";
+
+const ALBUM_STAGES = ["albumAppearing", "albumOpening", "completed"] as const;
 
 export default function Home() {
   const { state, dispatch } = usePuzzle();
 
   useEffect(() => {
     if (state.stage === "beeSelected") {
-      const timer = setTimeout(() => dispatch({ type: "START_FLYING" }), 1400);
+      const timer = setTimeout(() => dispatch({ type: "START_FLYING" }), 2400);
       return () => clearTimeout(timer);
     }
 
@@ -36,12 +41,22 @@ export default function Home() {
     }
 
     if (state.stage === "celebration") {
-      const timer = setTimeout(() => dispatch({ type: "RESET" }), 3800);
+      const timer = setTimeout(() => dispatch({ type: "SHOW_ALBUM" }), 2800);
+      return () => clearTimeout(timer);
+    }
+
+    if (state.stage === "albumAppearing") {
+      const timer = setTimeout(() => dispatch({ type: "OPEN_ALBUM" }), 1000);
+      return () => clearTimeout(timer);
+    }
+
+    if (state.stage === "albumOpening") {
+      const timer = setTimeout(() => dispatch({ type: "COMPLETE" }), 1200);
       return () => clearTimeout(timer);
     }
 
     if (state.stage === "idle" && state.selectedBeeId) {
-      const timer = setTimeout(() => dispatch({ type: "FINISH_RETURN" }), 2200);
+      const timer = setTimeout(() => dispatch({ type: "FINISH_RETURN" }), 3200);
       return () => clearTimeout(timer);
     }
   }, [state.stage, state.selectedBeeId, state.collectedLetters, dispatch]);
@@ -62,35 +77,54 @@ export default function Home() {
     });
   };
 
+  const selectedBee = scene.bees.find(
+    (item) => item.id === state.selectedBeeId,
+  );
+
+  const albumStage = ALBUM_STAGES.includes(
+    state.stage as (typeof ALBUM_STAGES)[number],
+  );
+
   return (
-    <main className="relative h-screen overflow-hidden bg-[#FFF8E8]">
-      <Background />
+    <MotionConfig reducedMotion="user">
+      <main className="relative h-screen overflow-hidden bg-[#FFF8E8]">
+        <Background />
 
-      <Title collectedLetters={state.collectedLetters} />
+        {selectedBee && (
+          <FlightTrail
+            start={selectedBee.position}
+            end={scene.honeyPot.position}
+          />
+        )}
 
-      {scene.bees.map((bee) => (
-        <Bee
-          key={bee.id}
-          {...bee}
-          stage={state.stage}
-          selectedBeeId={state.selectedBeeId}
-          potPosition={scene.honeyPot.position}
-          wrongTarget={state.wrongBeeId}
-          wrongNonce={state.wrongNonce}
-          collected={
-            bee.letter ? state.collectedLetters.includes(bee.letter) : false
-          }
-          onClick={handleBeeClick}
+        <Title collectedLetters={state.collectedLetters} />
+
+        {scene.bees.map((bee) => (
+          <Bee
+            key={bee.id}
+            {...bee}
+            stage={state.stage}
+            selectedBeeId={state.selectedBeeId}
+            potPosition={scene.honeyPot.position}
+            wrongTarget={state.wrongBeeId}
+            wrongNonce={state.wrongNonce}
+            collected={
+              bee.letter ? state.collectedLetters.includes(bee.letter) : false
+            }
+            onClick={handleBeeClick}
+          />
+        ))}
+
+        <HoneyPot
+          {...scene.honeyPot}
+          level={state.collectedLetters.length}
+          tipped={state.stage === "celebration"}
         />
-      ))}
 
-      <HoneyPot
-        {...scene.honeyPot}
-        level={state.collectedLetters.length}
-        tipped={state.stage === "celebration"}
-      />
+        {state.stage === "celebration" && <HoneyRain />}
 
-      {state.stage === "celebration" && <HoneyRain />}
-    </main>
+        {albumStage && <AlbumPlaceholder stage={state.stage} />}
+      </main>
+    </MotionConfig>
   );
 }

@@ -84,6 +84,7 @@ const decorations: DecorationData[] = [
     rotate: 18,
     animation: "pulse",
     delay: 1.1,
+    hideOnMobile: true,
   },
   {
     id: "flower-top-right",
@@ -96,6 +97,7 @@ const decorations: DecorationData[] = [
     },
     animation: "sway",
     delay: 0.6,
+    hideOnMobile: true,
   },
   {
     id: "flower-bottom-left",

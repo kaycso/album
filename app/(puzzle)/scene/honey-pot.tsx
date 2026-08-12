@@ -74,6 +74,7 @@ export function HoneyPot({ position, level, tipped = false }: HoneyPotProps) {
               width={HONEY_POT_SIZE}
               height={HONEY_POT_SIZE}
               priority
+              className="h-auto w-[clamp(70px,13vw,110px)]"
             />
           </AnimatedDecoration>
         </motion.div>

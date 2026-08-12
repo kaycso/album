@@ -27,7 +27,7 @@ export function Title({ collectedLetters }: TitleProps) {
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-6">
       <AnimatedDecoration animation="breathe">
         <h1
-          className={`${playfair.className} text-7xl font-bold tracking-widest text-amber-900 select-none md:text-9xl`}
+          className={`${playfair.className} text-5xl font-bold tracking-widest text-amber-900 select-none sm:text-7xl md:text-9xl`}
         >
           {TITLE}
           {LETTERS.map((letter) => {

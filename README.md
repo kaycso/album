@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KayMel — Álbum de fotos interativo
+
+Presente interativo e responsivo para o aniversário de namoro. A página inicial é um puzzle: as abelhinhas escondem letras e, ao juntar a palavra **MEL** na ordem certa, o mel cai ("KayMel" → "cai mel"). Depois da celebração, a tela transiciona para o álbum de fotos.
 
 ## Getting Started
 
@@ -17,6 +19,11 @@ bun dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+## Melhorias futuras
+
+- Quando o mel cair, o "Mel" do título também escorrerá junto.
+- Conteúdo real do álbum de fotos (livro).
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 

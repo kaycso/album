@@ -73,12 +73,15 @@ export function Decoration({
   rotate = 0,
   animation = "none",
   delay = 0,
+  hideOnMobile = false,
 }: DecorationData) {
   const currentAnimation = decorationAnimations[animation];
 
   return (
     <motion.div
-      className="pointer-events-none absolute select-none"
+      className={`pointer-events-none absolute select-none ${
+        hideOnMobile ? "hidden sm:block" : ""
+      }`}
       style={{
         ...position,
       }}
