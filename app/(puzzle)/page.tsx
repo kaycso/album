@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { MotionConfig } from "framer-motion";
 
 import { scene } from "./_data/scene";
+import { FLIGHT_DURATION, RETURN_DURATION } from "./_data/constants";
 import { usePuzzle } from "./hooks/use-puzzle";
 import { AlbumPlaceholder } from "./scene/album-placeholder";
 import { Background } from "./scene/background";
@@ -20,7 +21,10 @@ export default function Home() {
 
   useEffect(() => {
     if (state.stage === "beeSelected") {
-      const timer = setTimeout(() => dispatch({ type: "START_FLYING" }), 2400);
+      const timer = setTimeout(
+        () => dispatch({ type: "START_FLYING" }),
+        FLIGHT_DURATION * 1000,
+      );
       return () => clearTimeout(timer);
     }
 
@@ -56,7 +60,10 @@ export default function Home() {
     }
 
     if (state.stage === "idle" && state.selectedBeeId) {
-      const timer = setTimeout(() => dispatch({ type: "FINISH_RETURN" }), 3200);
+      const timer = setTimeout(
+        () => dispatch({ type: "FINISH_RETURN" }),
+        (RETURN_DURATION + 0.2) * 1000,
+      );
       return () => clearTimeout(timer);
     }
   }, [state.stage, state.selectedBeeId, state.collectedLetters, dispatch]);

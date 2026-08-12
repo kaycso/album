@@ -1,15 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useMemo } from "react";
 
 import {
   BEE_SIZE,
   FLIGHT_DURATION,
   FLIGHT_POINTS,
-  FLIGHT_WANDER_X,
-  FLIGHT_WANDER_Y,
   HONEY_POT_SIZE,
 } from "../_data/constants";
+import { buildFlightPath } from "../_data/flight-path";
 import { Position } from "../types";
 
 const LAG_SEGMENTS = 1;
@@ -29,17 +29,10 @@ export function FlightTrail({ start, end }: FlightTrailProps) {
   const endX = (end.x / 100) * width + HONEY_POT_SIZE / 2;
   const endY = (end.y / 100) * height + HONEY_POT_SIZE / 2;
 
-  const dx = endX - startX;
-  const dy = endY - startY;
-
-  const points = Array.from({ length: FLIGHT_POINTS }, (_, index) => {
-    const t = index / (FLIGHT_POINTS - 1);
-
-    return {
-      x: startX + dx * t + Math.sin(t * Math.PI * 2) * FLIGHT_WANDER_X,
-      y: startY + dy * t - Math.sin(t * Math.PI) * FLIGHT_WANDER_Y,
-    };
-  });
+  const points = useMemo(
+    () => buildFlightPath(startX, startY, endX, endY),
+    [startX, startY, endX, endY],
+  );
 
   const stepDuration = FLIGHT_DURATION / (FLIGHT_POINTS - 1);
 

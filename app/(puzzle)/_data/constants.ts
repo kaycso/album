@@ -8,10 +8,16 @@ export const TITLE = "Kay";
 
 export const TITLE_HIGHLIGHT = "Mel";
 
-export const FLIGHT_POINTS = 16;
+export const FLIGHT_POINTS = 48;
 
-export const FLIGHT_DURATION = 2.4;
+export const FLIGHT_DURATION = 5.5;
 
-export const FLIGHT_WANDER_X = 150;
+export const RETURN_DURATION = 3;
 
-export const FLIGHT_WANDER_Y = 220;
+export const FLIGHT_LOOPS = 1;
+
+export const FLIGHT_LOOP_RADIUS = 90;
+
+export const FLIGHT_LOOP_RADIUS_MAX = 150;
+
+export const RETURN_BOW = 60;

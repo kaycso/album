@@ -7,14 +7,15 @@ import { useEffect, useMemo } from "react";
 import {
   BEE_SIZE,
   FLIGHT_DURATION,
-  FLIGHT_POINTS,
-  FLIGHT_WANDER_X,
-  FLIGHT_WANDER_Y,
   HONEY_POT_SIZE,
+  RETURN_DURATION,
 } from "../_data/constants";
+import {
+  buildFlightPath,
+  buildReturnPath,
+  buildRotationKeyframes,
+} from "../_data/flight-path";
 import { BeeData, Position, PuzzleStage } from "../types";
-
-const RETURN_DURATION = 3;
 
 type BeeProps = BeeData & {
   stage: PuzzleStage;
@@ -25,36 +26,6 @@ type BeeProps = BeeData & {
   collected: boolean;
   onClick?: (id: string) => void;
 };
-
-type Waypoint = {
-  x: number;
-  y: number;
-};
-
-function buildWaypoints(dx: number, dy: number): Waypoint[] {
-  return Array.from({ length: FLIGHT_POINTS }, (_, index) => {
-    const t = index / (FLIGHT_POINTS - 1);
-
-    return {
-      x: dx * t + Math.sin(t * Math.PI * 2) * FLIGHT_WANDER_X,
-      y: dy * t - Math.sin(t * Math.PI) * FLIGHT_WANDER_Y,
-    };
-  });
-}
-
-function buildRotationKeyframes(
-  points: Waypoint[],
-  baseRotate: number,
-): number[] {
-  return points.map((point, index) => {
-    const segment = Math.min(index, points.length - 2);
-    const next = points[segment + 1];
-    const heading =
-      (Math.atan2(next.y - point.y, next.x - point.x) * 180) / Math.PI;
-
-    return heading + 90 - baseRotate;
-  });
-}
 
 export function Bee({
   id,
@@ -85,27 +56,36 @@ export function Bee({
 
   const width = typeof window !== "undefined" ? window.innerWidth : 0;
   const height = typeof window !== "undefined" ? window.innerHeight : 0;
-  const sizeOffset = (HONEY_POT_SIZE - BEE_SIZE) / 2;
-  const dx = ((potPosition.x - position.x) * width) / 100 + sizeOffset;
-  const dy = ((potPosition.y - position.y) * height) / 100 + sizeOffset;
+  const baseX = (position.x / 100) * width;
+  const baseY = (position.y / 100) * height;
+  const startCenterX = baseX + BEE_SIZE / 2;
+  const startCenterY = baseY + BEE_SIZE / 2;
+  const endCenterX = (potPosition.x / 100) * width + HONEY_POT_SIZE / 2;
+  const endCenterY = (potPosition.y / 100) * height + HONEY_POT_SIZE / 2;
 
-  const goPoints = useMemo(() => buildWaypoints(dx, dy), [dx, dy]);
-  const returnPoints = useMemo(() => [...goPoints].reverse(), [goPoints]);
+  const goPoints = useMemo(
+    () => buildFlightPath(startCenterX, startCenterY, endCenterX, endCenterY),
+    [startCenterX, startCenterY, endCenterX, endCenterY],
+  );
+  const returnPoints = useMemo(
+    () => buildReturnPath(endCenterX, endCenterY, startCenterX, startCenterY),
+    [endCenterX, endCenterY, startCenterX, startCenterY],
+  );
 
   const goRotations = useMemo(
-    () => buildRotationKeyframes(goPoints, rotate),
+    () => [0, ...buildRotationKeyframes(goPoints, rotate)],
     [goPoints, rotate],
   );
-  const returnRotations = useMemo(
-    () => buildRotationKeyframes(returnPoints, rotate),
-    [returnPoints, rotate],
-  );
-
-  const goX = goPoints.map((point) => point.x);
-  const goY = goPoints.map((point) => point.y);
-  const returnX = returnPoints.map((point) => point.x);
-  const returnY = returnPoints.map((point) => point.y);
   const endRotate = goRotations[goRotations.length - 1];
+
+  const returnRotations = [endRotate, 0];
+
+  const goX = goPoints.map((point) => point.x - baseX - BEE_SIZE / 2);
+  const goY = goPoints.map((point) => point.y - baseY - BEE_SIZE / 2);
+  const returnX = returnPoints.map((point) => point.x - baseX - BEE_SIZE / 2);
+  const returnY = returnPoints.map((point) => point.y - baseY - BEE_SIZE / 2);
+  const potDx = endCenterX - baseX - BEE_SIZE / 2;
+  const potDy = endCenterY - baseY - BEE_SIZE / 2;
 
   useEffect(() => {
     if (wrongTarget === id && scope.current) {
@@ -125,8 +105,8 @@ export function Bee({
         left: `${position.x}%`,
       }}
       animate={{
-        x: flying ? goX : atPot ? dx : returning ? returnX : 0,
-        y: flying ? goY : atPot ? dy : returning ? returnY : 0,
+        x: flying ? goX : atPot ? potDx : returning ? returnX : 0,
+        y: flying ? goY : atPot ? potDy : returning ? returnY : 0,
         rotate: flying
           ? goRotations
           : atPot
