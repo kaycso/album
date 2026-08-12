@@ -38,7 +38,10 @@ export function Bee({
 
   const flying = isSelected && stage === "beeSelected";
   const atPot =
-    isSelected && (stage === "beeFlying" || stage === "pouringHoney");
+    isSelected &&
+    (stage === "beeFlying" ||
+      stage === "pouringHoney" ||
+      stage === "celebration");
   const returning = isSelected && stage === "idle";
 
   const width = typeof window !== "undefined" ? window.innerWidth : 0;
@@ -73,7 +76,7 @@ export function Bee({
           ? { duration: 1.4, ease: "easeInOut" }
           : returning
             ? { duration: 2, ease: "easeInOut" }
-            : { duration: 0.15 }
+            : { duration: 0.6, ease: "easeInOut" }
       }
     >
       <motion.button

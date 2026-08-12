@@ -7,6 +7,7 @@ import { usePuzzle } from "./hooks/use-puzzle";
 import { Background } from "./scene/background";
 import { Bee } from "./scene/bee";
 import { HoneyPot } from "./scene/honey-pot";
+import { HoneyRain } from "./scene/honey-rain";
 import { Title } from "./scene/title";
 
 export default function Home() {
@@ -24,7 +25,18 @@ export default function Home() {
     }
 
     if (state.stage === "pouringHoney") {
-      const timer = setTimeout(() => dispatch({ type: "FINISH_POUR" }), 700);
+      const timer = setTimeout(() => {
+        if (state.collectedLetters.length >= 3) {
+          dispatch({ type: "CELEBRATE" });
+        } else {
+          dispatch({ type: "FINISH_POUR" });
+        }
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+
+    if (state.stage === "celebration") {
+      const timer = setTimeout(() => dispatch({ type: "RESET" }), 3800);
       return () => clearTimeout(timer);
     }
 
@@ -32,7 +44,7 @@ export default function Home() {
       const timer = setTimeout(() => dispatch({ type: "FINISH_RETURN" }), 2200);
       return () => clearTimeout(timer);
     }
-  }, [state.stage, state.selectedBeeId, dispatch]);
+  }, [state.stage, state.selectedBeeId, state.collectedLetters, dispatch]);
 
   const interactive = state.stage === "idle";
 
@@ -72,7 +84,13 @@ export default function Home() {
         />
       ))}
 
-      <HoneyPot {...scene.honeyPot} level={state.collectedLetters.length} />
+      <HoneyPot
+        {...scene.honeyPot}
+        level={state.collectedLetters.length}
+        tipped={state.stage === "celebration"}
+      />
+
+      {state.stage === "celebration" && <HoneyRain />}
     </main>
   );
 }

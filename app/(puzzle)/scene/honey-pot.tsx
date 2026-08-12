@@ -11,9 +11,10 @@ const MAX_LEVEL = 3;
 
 type HoneyPotProps = HoneyPotData & {
   level: number;
+  tipped?: boolean;
 };
 
-export function HoneyPot({ position, level }: HoneyPotProps) {
+export function HoneyPot({ position, level, tipped = false }: HoneyPotProps) {
   return (
     <div
       className="absolute"
@@ -23,7 +24,11 @@ export function HoneyPot({ position, level }: HoneyPotProps) {
       }}
     >
       <div className="relative">
-        <div className="absolute -top-10 left-1/2 flex -translate-x-1/2 gap-1.5">
+        <motion.div
+          className="absolute -top-10 left-1/2 flex -translate-x-1/2 gap-1.5"
+          animate={tipped ? { opacity: 0 } : { opacity: 1 }}
+          transition={{ duration: 0.3 }}
+        >
           {Array.from({ length: MAX_LEVEL }, (_, index) => {
             const filled = index < level;
 
@@ -40,7 +45,7 @@ export function HoneyPot({ position, level }: HoneyPotProps) {
               />
             );
           })}
-        </div>
+        </motion.div>
 
         <AnimatePresence>
           <motion.div
@@ -53,15 +58,25 @@ export function HoneyPot({ position, level }: HoneyPotProps) {
           />
         </AnimatePresence>
 
-        <AnimatedDecoration animation="sway">
-          <Image
-            src="/illustrations/honey-pot-svgrepo-com.svg"
-            alt="Pote de mel"
-            width={HONEY_POT_SIZE}
-            height={HONEY_POT_SIZE}
-            priority
-          />
-        </AnimatedDecoration>
+        <motion.div
+          style={{ originX: 0.5, originY: 0.9 }}
+          animate={tipped ? { rotate: -60, y: 8 } : { rotate: 0, y: 0 }}
+          transition={
+            tipped
+              ? { duration: 0.6, ease: "easeOut" }
+              : { duration: 0.6, ease: "easeInOut" }
+          }
+        >
+          <AnimatedDecoration animation="sway">
+            <Image
+              src="/illustrations/honey-pot-svgrepo-com.svg"
+              alt="Pote de mel"
+              width={HONEY_POT_SIZE}
+              height={HONEY_POT_SIZE}
+              priority
+            />
+          </AnimatedDecoration>
+        </motion.div>
       </div>
     </div>
   );
