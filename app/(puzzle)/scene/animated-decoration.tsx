@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { ReactNode } from "react";
 
-export type Animation = "float" | "pulse" | "sway" | "breathe" | "none";
+import { Animation } from "../types";
 
 type Props = {
   children: ReactNode;

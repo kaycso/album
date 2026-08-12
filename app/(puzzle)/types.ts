@@ -1,4 +1,4 @@
-import { Animation } from "./_components/animated-decoration";
+export type Animation = "float" | "pulse" | "sway" | "breathe" | "none";
 
 export type Position = {
   x: number;

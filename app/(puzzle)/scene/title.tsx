@@ -3,6 +3,7 @@ import {
   // TODO: verificar qual fonte é melhor
   // Dancing_Script
 } from "next/font/google";
+import { TITLE, TITLE_HIGHLIGHT } from "../_data/constants";
 import { AnimatedDecoration } from "./animated-decoration";
 
 export const playfair = Playfair_Display({
@@ -17,7 +18,8 @@ export function Title() {
         <h1
           className={`${playfair.className} text-7xl font-bold tracking-widest text-amber-900 select-none md:text-9xl`}
         >
-          Kay<span className="text-amber-500">Mel</span>
+          {TITLE}
+          <span className="text-amber-500">{TITLE_HIGHLIGHT}</span>
         </h1>
       </AnimatedDecoration>
     </div>

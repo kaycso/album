@@ -1,7 +1,9 @@
-import { Background } from "./_components/background";
-import { Bee } from "./_components/bee";
-import { HoneyPot } from "./_components/honey-pot";
-import { Title } from "./_components/title";
+"use client";
+
+import { Background } from "./scene/background";
+import { Bee } from "./scene/bee";
+import { HoneyPot } from "./scene/honey-pot";
+import { Title } from "./scene/title";
 import { scene } from "./_data/scene";
 import { usePuzzle } from "./hooks/use-puzzle";
 
