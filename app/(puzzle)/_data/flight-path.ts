@@ -12,6 +12,12 @@ export type Waypoint = {
   y: number;
 };
 
+export type FlightPathOptions = {
+  entryAngle?: number;
+  direction?: 1 | -1;
+  centerOffsetScale?: number;
+};
+
 const TWO_PI = Math.PI * 2;
 const RAW_SAMPLES = 300;
 
@@ -60,16 +66,23 @@ export function buildFlightPath(
   startY: number,
   endX: number,
   endY: number,
+  options: FlightPathOptions = {},
 ): Waypoint[] {
+  const direction = options.direction ?? 1;
+  const entryAngle = options.entryAngle ?? Math.PI;
+  const centerOffsetScale = options.centerOffsetScale ?? 0;
+
   const dx = endX - startX;
   const dy = endY - startY;
-  const pathLen = Math.hypot(dx, dy);
+  const pathLen = Math.hypot(dx, dy) || 1;
   const radius = Math.min(
     Math.max(FLIGHT_LOOP_RADIUS, pathLen / 5),
     FLIGHT_LOOP_RADIUS_MAX,
   );
-  const cx = (startX + endX) / 2;
-  const cy = (startY + endY) / 2;
+  const nx = -dy / pathLen;
+  const ny = dx / pathLen;
+  const cx = (startX + endX) / 2 + nx * (centerOffsetScale * radius);
+  const cy = (startY + endY) / 2 + ny * (centerOffsetScale * radius);
 
   const loopArc = TWO_PI * radius * FLIGHT_LOOPS;
   const rampArc = Math.PI * radius;
@@ -90,24 +103,24 @@ export function buildFlightPath(
       centerX = startX + (cx - startX) * u;
       centerY = startY + (cy - startY) * u;
       r = radius * smoothstep(u);
-      theta = Math.PI * u;
+      theta = entryAngle * u;
     } else if (t <= b) {
       const u = (t - a) / (b - a);
       centerX = cx;
       centerY = cy;
       r = radius;
-      theta = Math.PI + TWO_PI * FLIGHT_LOOPS * u;
+      theta = entryAngle + TWO_PI * FLIGHT_LOOPS * u;
     } else {
       const u = (t - b) / (1 - b);
       centerX = cx + (endX - cx) * u;
       centerY = cy + (endY - cy) * u;
       r = radius * smoothstep(1 - u);
-      theta = Math.PI + TWO_PI * FLIGHT_LOOPS + Math.PI * u;
+      theta = entryAngle + TWO_PI * FLIGHT_LOOPS + Math.PI * u;
     }
 
     return {
       x: centerX + r * Math.cos(theta),
-      y: centerY + r * Math.sin(theta),
+      y: centerY + direction * r * Math.sin(theta),
     };
   });
 
@@ -122,10 +135,10 @@ export function buildReturnPath(
 ): Waypoint[] {
   const dx = endX - startX;
   const dy = endY - startY;
-  const len = Math.hypot(dx, dy) || 1;
-  const nx = -dy / len;
-  const ny = dx / len;
-  const bow = Math.min(Math.max(RETURN_BOW, len / 7), RETURN_BOW_MAX);
+  const pathLen = Math.hypot(dx, dy) || 1;
+  const nx = -dy / pathLen;
+  const ny = dx / pathLen;
+  const bow = Math.min(Math.max(RETURN_BOW, pathLen / 7), RETURN_BOW_MAX);
 
   const raw = Array.from({ length: RAW_SAMPLES }, (_, index) => {
     const t = index / (RAW_SAMPLES - 1);
@@ -140,31 +153,42 @@ export function buildReturnPath(
   return resampleByArcLength(raw);
 }
 
-function unwrapAngles(values: number[]): number[] {
-  const out: number[] = [values[0]];
+export function pathHeadings(points: Waypoint[]): number[] {
+  const headings: number[] = [];
 
-  for (let index = 1; index < values.length; index++) {
-    const delta = values[index] - values[index - 1];
-    const wrapped = ((((delta + 180) % 360) + 360) % 360) - 180;
-
-    out.push(out[index - 1] + wrapped);
+  for (let index = 0; index < points.length - 1; index++) {
+    const next = points[index + 1];
+    headings.push(
+      (Math.atan2(next.y - points[index].y, next.x - points[index].x) * 180) /
+        Math.PI,
+    );
   }
 
-  return out;
+  headings.push(headings[headings.length - 1]);
+
+  return headings;
 }
 
 export function buildRotationKeyframes(
   points: Waypoint[],
   baseRotate: number,
 ): number[] {
-  const raw = points.map((point, index) => {
-    const segment = Math.min(index, points.length - 2);
-    const next = points[segment + 1];
-    const heading =
-      (Math.atan2(next.y - point.y, next.x - point.x) * 180) / Math.PI;
+  return pathHeadings(points).map((heading) => heading + 90 - baseRotate);
+}
 
-    return heading + 90 - baseRotate;
-  });
+export function unwrapAngles(values: number[], seed: number): number[] {
+  const out: number[] = [];
+  let previous = seed;
 
-  return unwrapAngles(raw);
+  for (const value of values) {
+    const normalized = ((value % 360) + 360) % 360;
+    let delta = (((normalized - previous) % 360) + 360) % 360;
+
+    if (delta > 180) delta -= 360;
+
+    previous += delta;
+    out.push(previous);
+  }
+
+  return out;
 }

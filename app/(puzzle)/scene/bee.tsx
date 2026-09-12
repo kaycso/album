@@ -8,12 +8,15 @@ import {
   BEE_SIZE,
   FLIGHT_DURATION,
   HONEY_POT_SIZE,
+  POT_TURN_DURATION,
   RETURN_DURATION,
+  RETURN_SETTLE_KEYFRAMES,
 } from "../_data/constants";
 import {
   buildFlightPath,
   buildReturnPath,
   buildRotationKeyframes,
+  unwrapAngles,
 } from "../_data/flight-path";
 import { BeeData, Position, PuzzleStage } from "../types";
 
@@ -73,12 +76,37 @@ export function Bee({
   );
 
   const goRotations = useMemo(
-    () => [0, ...buildRotationKeyframes(goPoints, rotate)],
+    () => unwrapAngles([0, ...buildRotationKeyframes(goPoints, rotate)], 0),
     [goPoints, rotate],
   );
   const endRotate = goRotations[goRotations.length - 1];
+  const settleRotate = Math.round(endRotate / 360) * 360;
+  const turnRotate = endRotate + 180;
 
-  const returnRotations = [endRotate, 0];
+  const atPotRotations = useMemo(
+    () => [endRotate, turnRotate],
+    [endRotate, turnRotate],
+  );
+
+  const returnRotations = useMemo(() => {
+    const raw = unwrapAngles(
+      buildRotationKeyframes(returnPoints, rotate),
+      turnRotate,
+    );
+    if (RETURN_SETTLE_KEYFRAMES <= 1) return raw;
+
+    const blended = raw.slice();
+    const ease = (u: number) => u * u * (3 - 2 * u);
+
+    for (let index = 0; index < RETURN_SETTLE_KEYFRAMES; index++) {
+      const at = blended.length - 1 - index;
+      const u =
+        (RETURN_SETTLE_KEYFRAMES - 1 - index) / (RETURN_SETTLE_KEYFRAMES - 1);
+      blended[at] = raw[at] + (settleRotate - raw[at]) * ease(u);
+    }
+
+    return blended;
+  }, [returnPoints, rotate, turnRotate, settleRotate]);
 
   const goX = goPoints.map((point) => point.x - baseX - BEE_SIZE / 2);
   const goY = goPoints.map((point) => point.y - baseY - BEE_SIZE / 2);
@@ -110,17 +138,19 @@ export function Bee({
         rotate: flying
           ? goRotations
           : atPot
-            ? endRotate
+            ? atPotRotations
             : returning
               ? returnRotations
-              : 0,
+              : settleRotate,
       }}
       transition={
         flying
           ? { duration: FLIGHT_DURATION, ease: "linear" }
-          : returning
-            ? { duration: RETURN_DURATION, ease: "linear" }
-            : { duration: 0.6, ease: "easeInOut" }
+          : atPot
+            ? { duration: POT_TURN_DURATION, ease: "easeInOut" }
+            : returning
+              ? { duration: RETURN_DURATION, ease: "linear" }
+              : { duration: 0.6, ease: "easeInOut" }
       }
     >
       <motion.button
